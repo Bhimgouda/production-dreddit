@@ -5,8 +5,8 @@ import Loader from "./Loader";
 const Dashboard = ({
   setIsNewPostFormOpen,
   loadingPost,
-  mnemonic,
-  showMnemonicModal,
+  logicDriver,
+  showLoginModal,
   posts,
   handleUpvote,
   handleDownvote,
@@ -19,22 +19,16 @@ const Dashboard = ({
     <section className="middleSection iPadView">
       <div className="container-fluid">
         <div className="row">
-          <div className="col-12 col-sm-3 col-md-3">
-            {/* Voters Leaderboard */}
-          </div>
+          <div className="col-12 col-sm-3 col-md-3">{/* Voters Leaderboard */}</div>
           <div className="col-12 col-sm-6 col-md-6 orderTop">
             <div className="postBox">
               <div className="postRight">
                 <div
                   className="createyourpost"
-                  onClick={mnemonic ? popupHandler : showMnemonicModal}
+                  onClick={logicDriver ? popupHandler : showLoginModal}
                 >
                   <div className="yourProfile">{/* Profile Pic */}</div>
-                  <input
-                    type="text"
-                    className="postText"
-                    placeholder="Create New Post"
-                  />
+                  <input type="text" className="postText" placeholder="Create New Post" />
                 </div>
               </div>
             </div>

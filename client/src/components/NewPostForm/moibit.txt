@@ -1,0 +1,19 @@
+const formData = new FormData();
+formData.append("file", imageFile); // Replace with the actual file blob
+
+const headers = {
+  developerKey: "0x2b6e53d2Cd28a4882b7BA60CEc663A8bD735cD81",
+  nonce: 1704995477097,
+  signature:
+    "0xb70381243b3968548d340aa8ffbc3c229206c012212765e937590e02f5e4d1d44d8aac92b02a8851282b32016cb28a7542ab87490e602a68f78a6b3ae663f7461c",
+  networkID: "12D3KooWSMAGyrB9TG45AAWaQNJmMdfJpnLQ5e1XM21hkm3FokHk",
+};
+
+const response = await axios.post(
+  "https://api.moinet.io/moibit/v1/readfile",
+  { fileName: "ape.png", version: 1 },
+  {
+    headers,
+  }
+);
+return console.log(response);

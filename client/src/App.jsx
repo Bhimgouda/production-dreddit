@@ -5,37 +5,36 @@ import NewPostForm from "./components/NewPostForm/NewPostForm";
 import Dashboard from "./components/Dashboard";
 import { VoyageProvider, Wallet, getLogicDriver } from "js-moi-sdk";
 import LoginModal from "./components/LoginModal";
+import { error, info, success } from "./utils/toastWrapper";
 
 const provider = new VoyageProvider("babylon");
-
-// ------- Update with your logic Id ------------------ //
 const logicId = process.env.REACT_APP_LOGIC_ID;
+const wallet = new Wallet(provider);
+await wallet.fromMnemonic(process.env.REACT_APP_BASE_MNEMONIC, "m/44'/6174'/7020'/0/0");
+const baseLogicDriver = await getLogicDriver(logicId, wallet);
 
 function App() {
   const [posts, setPosts] = useState([]);
   const [isNewPostFormOpen, setIsNewPostFormOpen] = useState(false);
   const [loadingPost, setLoadingPost] = useState(false);
-  const [mnemonic, setMnemonic] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [logicDriver, setLogicDriver] = useState();
+  const [userName, setUserName] = useState();
 
   useEffect(() => {
-    if (!logicDriver) return;
-
     getPosts();
   }, [logicDriver]);
 
   const handleLogin = async (iomeObj) => {
     setIsModalOpen(false);
     const mnemonic = iomeObj.user.SRP();
-    // --- Init Wallet with users mnemonic ---- //
     try {
       const wallet = new Wallet(provider);
       await wallet.fromMnemonic(mnemonic, "m/44'/6174'/7020'/0/0");
       const lDriver = await getLogicDriver(logicId, wallet);
       setLogicDriver(lDriver);
-      setMnemonic(mnemonic);
-    } catch (error) {}
+      setUserName(iomeObj.userName);
+    } catch (e) {}
   };
 
   const handleCancel = () => {
@@ -47,62 +46,68 @@ function App() {
   };
 
   const handleLogout = () => {
-    setMnemonic("");
-    setPosts([]);
+    setLogicDriver();
   };
 
   const getPosts = async () => {
     try {
       setLoadingPost(true);
-      let ixResponse = await logicDriver.routines.GetPosts().call({
+      // Need to change later
+      let ixResponse = await baseLogicDriver.routines.GetPosts().call({
         fuelPrice: 1,
-        fuelLimit: 10000,
+        fuelLimit: 1000,
       });
       let { allPosts } = (await ixResponse.result()).output;
-      allPosts = await getUserVote(allPosts);
+      if (logicDriver) {
+        allPosts = await getUserVote(allPosts);
+      }
       allPosts.reverse();
       setPosts(allPosts);
       setLoadingPost(false);
-    } catch (error) {
+    } catch (e) {
       setLoadingPost(false);
-      console.log(error);
+      error(e.message);
     }
   };
 
   const getUserVote = async (posts) => {
     for (let i = 0; i < posts.length; i++) {
-      const readIx = await logicDriver.routines.GetUserVote([posts[i].id]).call({
+      const ixResponse = await logicDriver.routines.GetUserVote([posts[i].postId]).call({
         fuelPrice: 1,
         fuelLimit: 1000,
       });
-      const { vote } = (await readIx.result()).output;
+      const { vote } = (await ixResponse.result()).output;
       posts[i].usersVote = vote;
     }
     return posts;
   };
 
-  const handleCreatePost = async (content) => {
+  const handleCreatePost = async (imageUri, content) => {
     try {
-      const ix = await logicDriver.routines.CreatePost([content]).send({
+      info("Creating Post");
+      const ix = await logicDriver.routines.CreatePost([userName, imageUri, content]).send({
         fuelPrice: 1,
         fuelLimit: 1000,
       });
       const { post: newPost } = (await ix.result()).output;
       setPosts([newPost, ...posts]);
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      error(e.message);
     }
   };
 
   const handleUpvote = async (id) => {
+    if (!logicDriver) return showLoginModal();
+
     try {
+      info("Upvoting");
       const ix = await logicDriver.routines.Upvote([id]).send({
         fuelPrice: 1,
         fuelLimit: 1000,
       });
       await ix.wait();
       const tPost = posts.map((post) => {
-        if (post.id === id) {
+        if (post.postId === id) {
           if (post.usersVote == 2) {
             post.downvotes--;
           }
@@ -112,20 +117,25 @@ function App() {
         return post;
       });
       setPosts(tPost);
-    } catch (error) {
-      console.log(error);
+      success("Succesfully Upvoted");
+    } catch (e) {
+      // Need to change later
+      error("insufficie");
     }
   };
 
   const handleDownvote = async (id) => {
+    if (!logicDriver) return showLoginModal();
+
     try {
+      info("Downvoting");
       const ix = await logicDriver.routines.Downvote([id]).send({
         fuelPrice: 1,
         fuelLimit: 1000,
       });
       await ix.wait();
       const tPost = posts.map((post) => {
-        if (post.id === id) {
+        if (post.postId === id) {
           if (post.usersVote == 1) {
             post.upvotes--;
           }
@@ -135,14 +145,19 @@ function App() {
         return post;
       });
       setPosts(tPost);
-    } catch (error) {
-      console.log(error);
+      success("Succesfully Downvoted");
+    } catch (e) {
+      error(e.message);
     }
   };
 
   return (
     <>
-      <Navbar handleLogout={handleLogout} mnemonic={mnemonic} showLoginModal={showLoginModal} />
+      <Navbar
+        handleLogout={handleLogout}
+        logicDriver={logicDriver}
+        showLoginModal={showLoginModal}
+      />
       <Toaster />
       <LoginModal handleCancel={handleCancel} handleLogin={handleLogin} isModalOpen={isModalOpen} />
       {isNewPostFormOpen && (
@@ -154,7 +169,7 @@ function App() {
       )}
       <Dashboard
         loadingPost={loadingPost}
-        mnemonic={mnemonic}
+        logicDriver={logicDriver}
         showLoginModal={showLoginModal}
         handleUpvote={handleUpvote}
         handleDownvote={handleDownvote}

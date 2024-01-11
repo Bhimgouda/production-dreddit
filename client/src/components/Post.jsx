@@ -13,7 +13,10 @@ const Post = ({ post, handleUpvote, handleDownvote }) => {
   return (
     <div className="post">
       <div className="postinfo">
-        <p className="post-creator">By - {`0x${truncateStr(numToHex(post.creator), 21)}`}</p>
+        <p className="post-creator">By - {`${post.creator}`}</p>
+        <div className="postimg">
+          <img src={post.imageUri} alt="picture" />
+        </div>
         <p className="post-content">{post.content}</p>
         <div className="post-action">
           <div className="row">
@@ -22,7 +25,7 @@ const Post = ({ post, handleUpvote, handleDownvote }) => {
               style={{ cursor: "pointer" }}
               onClick={async () => {
                 setUpvoting(true);
-                await handleUpvote(post.id);
+                await handleUpvote(post.postId);
                 setUpvoting(false);
               }}
             >
@@ -32,7 +35,7 @@ const Post = ({ post, handleUpvote, handleDownvote }) => {
                   className={post.usersVote === 1 ? "btnDao agreeLight" : "btnDao agreeBTN"}
                 >
                   <img className="icon" src={upvoteSvg} alt="check" />{" "}
-                  {post.usersVote === 1 ? "Upvoted" : "Upvote"}
+                  {/* {post.usersVote === 1 ? "Upvoted" : "Upvote"} */}
                   <span className="votes">{post.upvotes}</span>
                 </button>
               ) : (
@@ -46,7 +49,7 @@ const Post = ({ post, handleUpvote, handleDownvote }) => {
               style={{ cursor: "pointer" }}
               onClick={async () => {
                 setDownvoting(true);
-                await handleDownvote(post.id);
+                await handleDownvote(post.postId);
                 setDownvoting(false);
               }}
             >
@@ -56,7 +59,7 @@ const Post = ({ post, handleUpvote, handleDownvote }) => {
                   className={post.usersVote === 2 ? "btnDao disagreeLight" : "btnDao disagreeBTN"}
                 >
                   <img className="icon" src={downvoteSvg} alt="x" />{" "}
-                  {post.usersVote === 2 ? "Downvoted" : "Downvote"}
+                  {/* {post.usersVote === 2 ? "Downvoted" : "Downvote"} */}
                   <span className="votes">{post.downvotes}</span>
                 </button>
               ) : (

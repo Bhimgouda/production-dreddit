@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 // import { truncateStr } from "../utils/truncate";
 
-const Navbar = ({ showLoginModal, mnemonic, handleLogout }) => {
+const Navbar = ({ showLoginModal, logicDriver, handleLogout }) => {
   const [toggleValue, setToggle] = useState(false);
 
   const navRef = useRef(null);
@@ -49,8 +49,8 @@ const Navbar = ({ showLoginModal, mnemonic, handleLogout }) => {
             {link.label}
           </a>
         ))}
-        <a onClick={!mnemonic ? showLoginModal : handleLogout} rel="noopener noreferrer">
-          {!mnemonic ? "Login" : "Logout"}
+        <a onClick={!logicDriver ? showLoginModal : handleLogout} rel="noopener noreferrer">
+          {!logicDriver ? "Login" : "Logout"}
         </a>
       </ul>
     </nav>

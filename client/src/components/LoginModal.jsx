@@ -11,10 +11,7 @@ const LoginModal = ({ isModalOpen, handleLogin, handleCancel }) => {
   }, []);
 
   const initializeIome = async () => {
-    let newIome = new IOMe(
-      "0x2b6e53d2Cd28a4882b7BA60CEc663A8bD735cD81",
-      "0x55b66e4ce328aca8367847c8f9f74d9f6a10168f499235041fa83da77fecd1b5"
-    );
+    let newIome = new IOMe(process.env.REACT_APP_DEVELOPER_ID, process.env.REACT_APP_APP_SECRET);
     await newIome.InitDev();
     await newIome.InitApp();
     setIome(newIome);
@@ -22,7 +19,7 @@ const LoginModal = ({ isModalOpen, handleLogin, handleCancel }) => {
 
   return (
     <>
-      <Modal open={isModalOpen} onCancel={handleCancel} destroyOnClose={true}>
+      <Modal open={isModalOpen} onCancel={handleCancel} onOk={handleCancel} destroyOnClose={true}>
         {iome ? (
           <Connect onSuccess={handleLogin} iome={iome} />
         ) : (
