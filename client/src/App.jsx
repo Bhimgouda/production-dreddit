@@ -52,7 +52,6 @@ function App() {
   const getPosts = async () => {
     try {
       setLoadingPost(true);
-      // Need to change later
       let ixResponse = await baseLogicDriver.routines.GetPosts().call({
         fuelPrice: 1,
         fuelLimit: 1000,
@@ -66,7 +65,12 @@ function App() {
       setLoadingPost(false);
     } catch (e) {
       setLoadingPost(false);
-      error(e.message);
+
+      error(
+        e.message.startsWith("failed to fetch state object")
+          ? "Account Not Found, Please claim faucet from Voyage"
+          : e.message
+      );
     }
   };
 
@@ -92,7 +96,11 @@ function App() {
       const { post: newPost } = (await ix.result()).output;
       setPosts([newPost, ...posts]);
     } catch (e) {
-      error(e.message);
+      error(
+        e.message.startsWith("failed to fetch state object")
+          ? "Account Not Found, Please claim faucet from Voyage"
+          : e.message
+      );
     }
   };
 
@@ -120,7 +128,11 @@ function App() {
       success("Succesfully Upvoted");
     } catch (e) {
       // Need to change later
-      error("insufficie");
+      error(
+        e.message.startsWith("failed to fetch state object")
+          ? "Account Not Found, Please claim faucet from Voyage"
+          : e.message
+      );
     }
   };
 
@@ -147,7 +159,11 @@ function App() {
       setPosts(tPost);
       success("Succesfully Downvoted");
     } catch (e) {
-      error(e.message);
+      error(
+        e.message.startsWith("failed to fetch state object")
+          ? "Account Not Found, Please claim faucet from Voyage"
+          : e.message
+      );
     }
   };
 
@@ -157,6 +173,7 @@ function App() {
         handleLogout={handleLogout}
         logicDriver={logicDriver}
         showLoginModal={showLoginModal}
+        userName={userName}
       />
       <Toaster />
       <LoginModal handleCancel={handleCancel} handleLogin={handleLogin} isModalOpen={isModalOpen} />

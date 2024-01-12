@@ -2,8 +2,6 @@ import upvoteSvg from "../assets/upvote.svg";
 import downvoteSvg from "../assets/downvote.svg";
 import { useState } from "react";
 import Loader from "./Loader";
-import { numToHex } from "js-moi-sdk";
-import { truncateStr } from "../utils/truncate";
 
 const Post = ({ post, handleUpvote, handleDownvote }) => {
   // Loader

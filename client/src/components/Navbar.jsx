@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 // import { truncateStr } from "../utils/truncate";
 
-const Navbar = ({ showLoginModal, logicDriver, handleLogout }) => {
+const Navbar = ({ showLoginModal, logicDriver, handleLogout, userName }) => {
   const [toggleValue, setToggle] = useState(false);
 
   const navRef = useRef(null);
