@@ -821,3 +821,16 @@ button {
     width: 60px;
   }
 }
+
+.btn-container {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 40px;
+}
