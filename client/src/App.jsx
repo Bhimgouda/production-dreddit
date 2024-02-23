@@ -10,7 +10,10 @@ import { error, info, success } from "./utils/toastWrapper";
 const provider = new VoyageProvider("babylon");
 const logicId = process.env.REACT_APP_LOGIC_ID;
 const wallet = new Wallet(provider);
-await wallet.fromMnemonic(process.env.REACT_APP_BASE_MNEMONIC, "m/44'/6174'/7020'/0/0");
+await wallet.fromMnemonic(
+  process.env.REACT_APP_BASE_MNEMONIC,
+  "m/44'/6174'/7020'/0/0"
+);
 const baseLogicDriver = await getLogicDriver(logicId, wallet);
 
 function App() {
@@ -52,11 +55,7 @@ function App() {
   const getPosts = async () => {
     try {
       setLoadingPost(true);
-      let ixResponse = await baseLogicDriver.routines.GetPosts().call({
-        fuelPrice: 1,
-        fuelLimit: 1000,
-      });
-      let { allPosts } = (await ixResponse.result()).output;
+      let { allPosts } = await baseLogicDriver.routines.GetPosts();
       if (logicDriver) {
         allPosts = await getUserVote(allPosts);
       }
@@ -67,7 +66,7 @@ function App() {
       setLoadingPost(false);
 
       error(
-        e.message.startsWith("failed to fetch state object")
+        e.message.startsWith("account not found")
           ? "Account Not Found, Please claim faucet from Voyage"
           : e.message
       );
@@ -76,11 +75,7 @@ function App() {
 
   const getUserVote = async (posts) => {
     for (let i = 0; i < posts.length; i++) {
-      const ixResponse = await logicDriver.routines.GetUserVote([posts[i].postId]).call({
-        fuelPrice: 1,
-        fuelLimit: 1000,
-      });
-      const { vote } = (await ixResponse.result()).output;
+      const { vote } = await logicDriver.routines.GetUserVote(posts[i].postId);
       posts[i].usersVote = vote;
     }
     return posts;
@@ -89,15 +84,17 @@ function App() {
   const handleCreatePost = async (imageUri, content) => {
     try {
       info("Creating Post");
-      const ix = await logicDriver.routines.CreatePost([userName, imageUri, content]).send({
-        fuelPrice: 1,
-        fuelLimit: 1000,
-      });
-      const { post: newPost } = (await ix.result()).output;
+      const ixResponse = await logicDriver.routines.CreatePost(
+        userName,
+        imageUri,
+        content
+      );
+
+      const { post: newPost } = await ixResponse.result();
       setPosts([newPost, ...posts]);
     } catch (e) {
       error(
-        e.message.startsWith("failed to fetch state object")
+        e.message.startsWith("account not found")
           ? "Account Not Found, Please claim faucet from Voyage"
           : e.message
       );
@@ -109,10 +106,7 @@ function App() {
 
     try {
       info("Upvoting");
-      const ix = await logicDriver.routines.Upvote([id]).send({
-        fuelPrice: 1,
-        fuelLimit: 1000,
-      });
+      const ix = await logicDriver.routines.Upvote(id);
       await ix.wait();
       const tPost = posts.map((post) => {
         if (post.postId === id) {
@@ -129,7 +123,7 @@ function App() {
     } catch (e) {
       // Need to change later
       error(
-        e.message.startsWith("failed to fetch state object")
+        e.message.startsWith("account not found")
           ? "Account Not Found, Please claim faucet from Voyage"
           : e.message
       );
@@ -141,10 +135,7 @@ function App() {
 
     try {
       info("Downvoting");
-      const ix = await logicDriver.routines.Downvote([id]).send({
-        fuelPrice: 1,
-        fuelLimit: 1000,
-      });
+      const ix = await logicDriver.routines.Downvote(id);
       await ix.wait();
       const tPost = posts.map((post) => {
         if (post.postId === id) {
@@ -160,7 +151,7 @@ function App() {
       success("Succesfully Downvoted");
     } catch (e) {
       error(
-        e.message.startsWith("failed to fetch state object")
+        e.message.startsWith("account not found")
           ? "Account Not Found, Please claim faucet from Voyage"
           : e.message
       );
@@ -176,7 +167,11 @@ function App() {
         userName={userName}
       />
       <Toaster />
-      <LoginModal handleCancel={handleCancel} handleLogin={handleLogin} isModalOpen={isModalOpen} />
+      <LoginModal
+        handleCancel={handleCancel}
+        handleLogin={handleLogin}
+        isModalOpen={isModalOpen}
+      />
       {isNewPostFormOpen && (
         <NewPostForm
           handleCreatePost={handleCreatePost}

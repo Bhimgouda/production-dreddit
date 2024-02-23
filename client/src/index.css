@@ -822,15 +822,22 @@ button {
   }
 }
 
-.btn-container {
-  background-color: transparent;
-  border: none;
+#login-container {
+  text-align: center;
+}
+
+button {
+  padding: 10px;
+  margin: 5px;
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 18px;
-  font-weight: 600;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 40px;
+}
+
+button:hover {
+  background-color: #ddd;
+}
+
+#username-display {
+  margin-top: 10px;
+  color: green;
+  font-weight: bold;
 }
