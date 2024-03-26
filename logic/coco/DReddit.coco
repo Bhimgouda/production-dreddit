@@ -53,6 +53,9 @@ endpoint deployer Init!():
 // CreatePost!() is an invokable that creates & adds a new post
 // and also returns the new post
 endpoint invokable CreatePost!(creator, imageUri, content String) -> (post Post):
+    if(creator == "" || content == ""):
+        throw "Invalid Input"
+
     var newPost = Post{
         creator: creator,
         imageUri: imageUri,

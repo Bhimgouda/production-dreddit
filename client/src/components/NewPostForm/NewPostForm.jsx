@@ -25,17 +25,20 @@ const ModalOverlay = (props) => {
   const handleCreatePost = async (e) => {
     e.preventDefault();
     try {
-      if (postContent < 10) return error("Post Content needs to be more than 10 characters");
-      if (!imageFile) return error("Please upload an Image to proceed");
       setLoadingStatus({ isLoading: true, isSuccess: false });
 
-      const formData = new FormData();
-      formData.append("file", imageFile);
-      formData.append("upload_preset", "kvqwkw2q");
+      if (postContent < 10) return error("Post Content needs to be more than 10 characters");
+      let imageUri = "";
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append("file", imageFile);
+        formData.append("upload_preset", "kvqwkw2q");
 
-      const { secure_url: imageUri } = (
-        await axios.post("https://api.cloudinary.com/v1_1/dxgbnqbew/image/upload", formData)
-      ).data;
+        const { secure_url } = (
+          await axios.post("https://api.cloudinary.com/v1_1/dxgbnqbew/image/upload", formData)
+        ).data;
+        imageUri = secure_url;
+      }
 
       await props.handleCreatePost(imageUri, postContent);
 
