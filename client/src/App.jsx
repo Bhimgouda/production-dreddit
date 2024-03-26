@@ -6,6 +6,7 @@ import LoginModal from "./components/LoginModal";
 import { error, info, success } from "./utils/toastWrapper";
 import Home from "./pages/Home";
 import { Route, Routes } from "react-router-dom";
+import Faucet from "./pages/Faucet";
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -55,6 +56,7 @@ function App() {
       />
       <Routes>
         <Route path="/" element={<Home logicDriver={logicDriver} />} />
+        <Route path="/faucet" element={<Faucet />} />
       </Routes>
     </>
   );
