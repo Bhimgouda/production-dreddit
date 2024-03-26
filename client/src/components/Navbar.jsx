@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import {Link} from 'react-router-dom'
 // import { truncateStr } from "../utils/truncate";
 
 const Navbar = ({ showLoginModal, logicDriver, handleLogout, userName }) => {
@@ -6,7 +7,7 @@ const Navbar = ({ showLoginModal, logicDriver, handleLogout, userName }) => {
 
   const navRef = useRef(null);
 
-  const theNavLinks = [{ label: "Built on MOI", link: "https://moi.technology/" }];
+  const theNavLinks = [{ label: "Built on MOI", link: "https://moi.technology/" }, { label: "Faucet", link: "https://moi.technology/" }];
 
   const handleToggle = () => {
     setToggle(!toggleValue);
@@ -44,11 +45,13 @@ const Navbar = ({ showLoginModal, logicDriver, handleLogout, userName }) => {
         ref={navRef}
         className={(toggleValue && "nav__links nav__links--expanded") || "nav__links"}
       >
-        {theNavLinks.map((link, index) => (
-          <a key={index} href={link.link} target="_blank" rel="noopener noreferrer">
-            {link.label}
+         <a href="https://moi.technology/" target="_blank" rel="noopener noreferrer">
+            Built on MOI
           </a>
-        ))}
+          <Link to="/faucet">
+          Faucet
+
+          </Link>
         <a onClick={!logicDriver ? showLoginModal : handleLogout} rel="noopener noreferrer">
           {!logicDriver ? "Login" : "Logout"}
         </a>
