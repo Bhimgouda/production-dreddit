@@ -26,6 +26,11 @@ class Post:
     field content String
     field upvotes U64
     field downvotes U64
+    field comments []Comment
+
+class Comment:
+    field commentor String
+    field text String
 
 ////////////////////////
 ////// Deployer Endpoints
@@ -53,7 +58,8 @@ endpoint invokable CreatePost!(creator, imageUri, content String) -> (post Post)
         imageUri: imageUri,
         content: content,
         upvotes: 0,
-        downvotes: 0
+        downvotes: 0,
+        comments: make([]Comment)
     }
 
     // "<-" is used to read and then mutate the state
@@ -110,6 +116,16 @@ endpoint invokable Downvote!(id U64):
         allPosts[id].downvotes += 1  
         if(usersVote == 1):
             allPosts[id].upvotes -= 1
+
+endpoint invokable Comment!(id U64, commentor String, text String):
+    var newComment = Comment{
+        commentor: commentor,
+        text: text
+    }
+
+    mutate posts <- DReddit.State.posts:
+        posts[id].comments = append(posts[id].comments, newComment)
+
 
 //////////////////////
 ////// Read Endpoints

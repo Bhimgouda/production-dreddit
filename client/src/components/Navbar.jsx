@@ -37,7 +37,7 @@ const Navbar = ({ showLoginModal, logicDriver, handleLogout, userName }) => {
           <div></div>
         </div>
         <a href="/" className="">
-          <h2>DReddit</h2>
+          <h2>Socupt</h2>
         </a>
       </div>
       <ul

@@ -10,10 +10,7 @@ import { error, info, success } from "./utils/toastWrapper";
 const provider = new VoyageProvider("babylon");
 const logicId = process.env.REACT_APP_LOGIC_ID;
 const wallet = new Wallet(provider);
-await wallet.fromMnemonic(
-  process.env.REACT_APP_BASE_MNEMONIC,
-  "m/44'/6174'/7020'/0/0"
-);
+await wallet.fromMnemonic(process.env.REACT_APP_BASE_MNEMONIC, "m/44'/6174'/7020'/0/0");
 const baseLogicDriver = await getLogicDriver(logicId, wallet);
 
 function App() {
@@ -84,11 +81,7 @@ function App() {
   const handleCreatePost = async (imageUri, content) => {
     try {
       info("Creating Post");
-      const ixResponse = await logicDriver.routines.CreatePost(
-        userName,
-        imageUri,
-        content
-      );
+      const ixResponse = await logicDriver.routines.CreatePost(userName, imageUri, content);
 
       const { post: newPost } = await ixResponse.result();
       setPosts([newPost, ...posts]);
@@ -167,11 +160,7 @@ function App() {
         userName={userName}
       />
       <Toaster />
-      <LoginModal
-        handleCancel={handleCancel}
-        handleLogin={handleLogin}
-        isModalOpen={isModalOpen}
-      />
+      <LoginModal handleCancel={handleCancel} handleLogin={handleLogin} isModalOpen={isModalOpen} />
       {isNewPostFormOpen && (
         <NewPostForm
           handleCreatePost={handleCreatePost}
