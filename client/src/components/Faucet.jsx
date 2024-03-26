@@ -1,5 +1,5 @@
 import React from 'react'
-import {Card, Skeleton} from 'antd'
+import {Card, Skeleton,Loader} from 'antd'
 
 function Faucet() {
       const [isLoading, setLoading] = useState(false);
@@ -20,7 +20,7 @@ function Faucet() {
 <div className="">
 <div className="">Available Limit</div>
 <h1>
-                    {refillTime === "00:00:00" ? claimAmount : 0}{" "}
+    {refillTime === "00:00:00" ? claimAmount : 0}{" "}
                     {/* {tokenDetails.name} */}
 </h1>
 </div>
