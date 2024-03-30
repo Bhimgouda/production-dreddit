@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import {Link} from 'react-router-dom'
+import { Link } from "react-router-dom";
 // import { truncateStr } from "../utils/truncate";
+import logo from "../assets/socupt-logo.png";
 
-const Navbar = ({ showLoginModal, logicDriver, handleLogout, userName }) => {
+const Navbar = ({ showConnectModal, user, updateUser }) => {
   const [toggleValue, setToggle] = useState(false);
 
   const navRef = useRef(null);
-
-  const theNavLinks = [{ label: "Built on MOI", link: "https://moi.technology/" }, { label: "Faucet", link: "https://moi.technology/" }];
 
   const handleToggle = () => {
     setToggle(!toggleValue);
@@ -38,23 +37,24 @@ const Navbar = ({ showLoginModal, logicDriver, handleLogout, userName }) => {
           <div></div>
         </div>
         <a href="/" className="">
-          <h2>Socupt</h2>
+          <img style={{ height: 50 }} src={logo} />
         </a>
       </div>
       <ul
         ref={navRef}
         className={(toggleValue && "nav__links nav__links--expanded") || "nav__links"}
       >
-         <a href="https://moi.technology/" target="_blank" rel="noopener noreferrer">
-            Built on MOI
-          </a>
-          <Link to="/faucet">
-          Faucet
-
-          </Link>
-        <a onClick={!logicDriver ? showLoginModal : handleLogout} rel="noopener noreferrer">
-          {!logicDriver ? "Login" : "Logout"}
-        </a>
+        {/* <a href="https://moi.technology/" target="_blank" rel="noopener noreferrer">
+          Built on MOI
+        </a> */}
+        <Link to="/faucet">Faucet</Link>
+        <button
+          className="btn btn--primary btn--connect"
+          onClick={!user.wallet ? () => showConnectModal(true) : () => updateUser(null)}
+          rel="noopener noreferrer"
+        >
+          {!user.wallet ? "Login" : "Logout"}
+        </button>
       </ul>
     </nav>
   );

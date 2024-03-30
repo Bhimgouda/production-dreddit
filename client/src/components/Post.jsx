@@ -12,8 +12,15 @@ const Post = ({ post, handleUpvote, handleDownvote }) => {
     <div className="post">
       <div className="postinfo">
         <p className="post-creator">By - {`${post.creator}`}</p>
-        <div className="postimg">{post.imageUri && <img src={post.imageUri} alt="picture" />}</div>
         <p className="post-content">{post.content}</p>
+        <div className="postimg">
+          {post.imageUri && (
+            <img
+              src={post.imageUri.replace("/image/upload/", "/image/upload/w_600/")}
+              alt="picture"
+            />
+          )}
+        </div>
         <div className="post-action">
           <div className="row">
             <div

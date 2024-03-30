@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import classes from "./NewPostForm.module.css";
-import { error, info, success } from "../../utils/toastWrapper";
+import { toastError, toastSuccess } from "../../utils/toastWrapper";
 import Loader from "../../components/Loader";
 import axios from "axios";
 
@@ -16,11 +16,6 @@ const ModalOverlay = (props) => {
     isLoading: false,
     isSuccess: false,
   });
-
-  const errorWrapper = (message) => {
-    setLoadingStatus({ isLoading: false, isSuccess: false });
-    error(message);
-  };
 
   const handleCreatePost = async (e) => {
     e.preventDefault();
@@ -45,7 +40,8 @@ const ModalOverlay = (props) => {
       setLoadingStatus({ isLoading: false, isSuccess: true });
       props.onClose();
     } catch (e) {
-      errorWrapper("Something went wrong");
+      console.log(e);
+      toastError(e.message);
     }
   };
 
@@ -54,10 +50,10 @@ const ModalOverlay = (props) => {
     const maxSizeInBytes = 50097152; // 50MB
 
     if (file && file.size > maxSizeInBytes) {
-      return error("Image file size exceeds 50mb");
+      return toastError("Image file size exceeds 50mb");
     }
     setImageFile(file);
-    success("Image selected successfully");
+    toastSuccess("Image selected successfully");
   };
 
   return (

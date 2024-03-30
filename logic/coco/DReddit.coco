@@ -5,13 +5,7 @@ coco DReddit
 ////// Logic State 
 //////////////////////
 state persistent:
-    // Mapping of id => Post
-    posts []Post
-
-    // Mapping of Address => U64 => U64
-    // UserAddress(Address) => id(U64) => 0, 1, 2(U64)
-    // 0 for not voted, 1 for upvoted, 2 for downvoted
-    votes Map[Address]Map[U64]U64
+    posts Map[U64]Post
 
 ////////////////////////
 ////// Classes
@@ -27,6 +21,7 @@ class Post:
     field upvotes U64
     field downvotes U64
     field comments []Comment
+    field votes Map[Address]U64 // 0 for not voted, 1 for upvoted, 2 for downvoted
 
 class Comment:
     field commentor String
@@ -62,7 +57,8 @@ endpoint invokable CreatePost!(creator, imageUri, content String) -> (post Post)
         content: content,
         upvotes: 0,
         downvotes: 0,
-        comments: make([]Comment)
+        comments: make([]Comment),
+        votes: make(Map[Address]U64)
     }
 
     // "<-" is used to read and then mutate the state
@@ -70,55 +66,43 @@ endpoint invokable CreatePost!(creator, imageUri, content String) -> (post Post)
     // block will be assigned to DReddit.State.posts)
     mutate posts <- DReddit.State.posts:
         newPost.id = len(posts)
-        posts = append(posts, newPost)
+        posts[len(posts)] = newPost
         yield post newPost // To return new Post
 
 // Upvote!() is an invokable to upvote
 // the post with given id
 endpoint invokable Upvote!(id U64):
     var user Address = Address(Sender)
-    var usersVote U64
-
-    // observe is used to read from the state
-    observe votes <- DReddit.State.votes:
-        usersVote = votes[user][id]
-
-    // throw is used to throw an error 
-    // statement reverting all the state changes
-    if(usersVote == 1):
-        throw "Already Upvoted"
     
-    // Mutating user's vote for the given post
-    mutate votes <- DReddit.State.votes:
-        votes[user][id] = 1
+    mutate posts <- DReddit.State.posts:
+        var post = posts[id]
+        var userVote = post.votes[user]
 
-    // Updating Post's total count of downvotes and upvotes
-    mutate allPosts <- DReddit.State.posts:
-        allPosts[id].upvotes += 1
-        if(usersVote == 2):
-            allPosts[id].downvotes -= 1
+        if(userVote == 1):
+            throw "Already Upvoted"
+        else if(userVote == 2):
+            post.downvotes -= 1
+        
+        post.votes[user] = 1
+        post.upvotes += 1
+        
 
 // Downvote!() is an invokable to downvote
 // the post with given id
 endpoint invokable Downvote!(id U64):
     var user Address = Address(Sender)
-    var usersVote U64
-
-    observe votes <- DReddit.State.votes:
-        usersVote = votes[user][id]
-
-    if(usersVote == 2):
-        throw "Already Downvoted"
     
-    // Mutating user's vote for the given post
-    mutate votes <- DReddit.State.votes:
-        votes[user][id] = 2
+    mutate posts <- DReddit.State.posts:
+        var post = posts[id]
+        var userVote = post.votes[user]
 
-    // Updating Post's total count of downvotes and upvotes
-    mutate allPosts <- DReddit.State.posts:
-        allPosts[id].downvotes += 1  
-        if(usersVote == 1):
-            allPosts[id].upvotes -= 1
+        if(userVote == 2):
+            throw "Already Downvoted"
+        else if(userVote == 1):
+            post.upvotes -= 1
+        
+        post.votes[user] = 2
+        post.downvotes += 1
 
 endpoint invokable Comment!(id U64, commentor String, text String):
     var newComment = Comment{
@@ -134,14 +118,5 @@ endpoint invokable Comment!(id U64, commentor String, text String):
 ////// Read Endpoints
 ////////////////////
 
-endpoint invokable GetPosts() -> (allPosts []Post):
-    observe posts <- DReddit.State.posts:
-        yield allPosts posts
-
-// getUsersVote() is an invokable endpoint to retrieve
-// the vote of the current user for a specific post (id)
-endpoint invokable GetUserVote(id U64) -> (vote U64):
-    var user Address = Address(Sender)
-    
-    observe votes <- DReddit.State.votes:
-        vote = votes[user][id]
+endpoint invokable GetPosts() -> (posts Map[U64]Post):
+    observe posts <- DReddit.State.posts

@@ -2,61 +2,42 @@ import React, { useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
 import { Toaster } from "react-hot-toast";
 import { VoyageProvider, Wallet, getLogicDriver } from "js-moi-sdk";
-import LoginModal from "./components/LoginModal";
-import { error, info, success } from "./utils/toastWrapper";
+import LoginModal from "./components/ConnectModal";
 import Home from "./pages/Home";
 import { Route, Routes } from "react-router-dom";
 import Faucet from "./pages/Faucet";
+import ConnectModal from "./components/ConnectModal";
+
+const DEFAULT_USER = { name: undefined, wallet: undefined, moiId: undefined };
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [logicDriver, setLogicDriver] = useState();
-  const [userName, setUserName] = useState();
+  const [user, setUser] = useState(DEFAULT_USER);
 
-  const handleLogin = async (iomeObj) => {
-    setIsModalOpen(false);
-    const mnemonic = iomeObj.user.SRP();
-    try {
-      const wallet = await Wallet.fromMnemonic(mnemonic, "m/44'/6174'/7020'/0/0");
-      wallet.connect(provider);
-      const lDriver = await getLogicDriver(logicId, wallet);
-      setLogicDriver(lDriver);
-      setUserName(iomeObj.userName);
-    } catch (e) {
-      console.log(e);
-    }
+  const updateUser = (newUser) => {
+    if (!user) return setUser(DEFAULT_USER);
+    setUser(newUser);
   };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
-
-  const showLoginModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleLogout = () => {
-    setLogicDriver();
+  const showConnectModal = (value) => {
+    setIsModalOpen(value);
   };
 
   return (
     <>
-      <Navbar
-        handleLogout={handleLogout}
-        logicDriver={logicDriver}
-        showLoginModal={showLoginModal}
-        userName={userName}
-      />
+      <Navbar showConnectModal={showConnectModal} user={user} updateUser={updateUser} />
       <Toaster />
-      <LoginModal
-        handleCancel={handleCancel}
-        handleLogin={handleLogin}
-        showLoginModal={showLoginModal}
+      <ConnectModal
         isModalOpen={isModalOpen}
+        showConnectModal={showConnectModal}
+        updateUser={updateUser}
       />
+
       <Routes>
-        <Route path="/" element={<Home logicDriver={logicDriver} />} />
-        <Route path="/faucet" element={<Faucet />} />
+        <Route path="/" element={<Home user={user} showConnectModal={showConnectModal} />} />
+        <Route
+          path="/faucet"
+          element={<Faucet user={user} showConnectModal={showConnectModal} />}
+        />
       </Routes>
     </>
   );

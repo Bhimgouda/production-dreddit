@@ -2,58 +2,48 @@ import { VoyageProvider, getLogicDriver } from "js-moi-sdk";
 import React, { useEffect, useState } from "react";
 import NewPostForm from "../components/NewPostForm/NewPostForm";
 import Dashboard from "../components/Dashboard";
+import logic from "../interface/logic";
+import { toastError, toastInfo, toastSuccess } from "../utils/toastWrapper";
 
-const provider = new VoyageProvider("babylon");
-const logicId = "0x08000071a79661f083eb97e48c09860d120b315516209f4376fee63389705552178fac";
-const baseLogicDriver = await getLogicDriver(logicId, provider);
-
-const Home = ({ logicDriver, showLoginModal }) => {
-  const [posts, setPosts] = useState([]);
+const Home = ({ user, showConnectModal }) => {
+  const [posts, setPosts] = useState({});
   const [isNewPostFormOpen, setIsNewPostFormOpen] = useState(false);
   const [loadingPost, setLoadingPost] = useState(false);
 
   useEffect(() => {
     getPosts();
-  }, [logicDriver]);
+  }, [user]);
 
   const getPosts = async () => {
     try {
       setLoadingPost(true);
-      let { allPosts } = await baseLogicDriver.routines.GetPosts();
-      if (logicDriver) {
-        allPosts = await getUserVote(allPosts);
-      }
-      allPosts.reverse();
+      let data = await logic.GetPosts();
+      console.log(data);
       setPosts(allPosts);
+
       setLoadingPost(false);
     } catch (e) {
       setLoadingPost(false);
-
-      error(
+      console.log(e);
+      toastError(
         e.message.startsWith("account not found")
           ? "Account Not Found, Please claim faucet from Voyage"
           : e.message
       );
     }
-  };
-
-  const getUserVote = async (posts) => {
-    for (let i = 0; i < posts.length; i++) {
-      const { vote } = await logicDriver.routines.GetUserVote(posts[i].postId);
-      posts[i].usersVote = vote;
-    }
-    return posts;
-  };
+  }; 
+  const map = new Map()
+  map.get()
 
   const handleCreatePost = async (imageUri, content) => {
     try {
-      info("Creating Post");
-      const ixResponse = await logicDriver.routines.CreatePost(userName, imageUri, content);
+      toastInfo("Creating Post");
+      const { post: newPost } = await logic.CreatePost(user.wallet, user.name, imageUri, content);
 
-      const { post: newPost } = await ixResponse.result();
       setPosts([newPost, ...posts]);
     } catch (e) {
-      error(
+      console.log(e);
+      toastError(
         e.message.startsWith("account not found")
           ? "Account Not Found, Please claim faucet from Voyage"
           : e.message
@@ -62,27 +52,17 @@ const Home = ({ logicDriver, showLoginModal }) => {
   };
 
   const handleUpvote = async (id) => {
-    if (!logicDriver) return showLoginModal();
+    if (!user.wallet) return showConnectModal(true);
 
     try {
-      info("Upvoting");
-      const ix = await logicDriver.routines.Upvote(id);
-      await ix.wait();
-      const tPost = posts.map((post) => {
-        if (post.postId === id) {
-          if (post.usersVote == 2) {
-            post.downvotes--;
-          }
-          post.upvotes++;
-          post.usersVote = 1;
-        }
-        return post;
-      });
-      setPosts(tPost);
-      success("Succesfully Upvoted");
+      toastInfo("Upvoting");
+      await logic.Upvote(user.wallet, id);
+
+      setPosts({ ...posts });
+      toastSuccess("Succesfully Upvoted");
     } catch (e) {
-      // Need to change later
-      error(
+      console.log(e);
+      toastError(
         e.message.startsWith("account not found")
           ? "Account Not Found, Please claim faucet from Voyage"
           : e.message
@@ -91,26 +71,17 @@ const Home = ({ logicDriver, showLoginModal }) => {
   };
 
   const handleDownvote = async (id) => {
-    if (!logicDriver) return showLoginModal();
+    if (!user.wallet) return showConnectModal(true);
 
     try {
-      info("Downvoting");
-      const ix = await logicDriver.routines.Downvote(id);
-      await ix.wait();
-      const tPost = posts.map((post) => {
-        if (post.postId === id) {
-          if (post.usersVote == 1) {
-            post.upvotes--;
-          }
-          post.usersVote = 2;
-          post.downvotes++;
-        }
-        return post;
-      });
-      setPosts(tPost);
-      success("Succesfully Downvoted");
+      toastInfo("Downvoting");
+      await logic.Downvote(user.wallet, id);
+
+      // Changes
+      toastSuccess("Succesfully Downvoted");
     } catch (e) {
-      error(
+      console.log(e);
+      toastError(
         e.message.startsWith("account not found")
           ? "Account Not Found, Please claim faucet from Voyage"
           : e.message
@@ -129,12 +100,12 @@ const Home = ({ logicDriver, showLoginModal }) => {
       )}
       <Dashboard
         loadingPost={loadingPost}
-        logicDriver={logicDriver}
-        showLoginModal={showLoginModal}
+        showConnectModal={showConnectModal}
         handleUpvote={handleUpvote}
         handleDownvote={handleDownvote}
         posts={posts}
         setIsNewPostFormOpen={setIsNewPostFormOpen}
+        user={user}
       />
     </>
   );
