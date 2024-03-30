@@ -2,8 +2,9 @@ import upvoteSvg from "../assets/upvote.svg";
 import downvoteSvg from "../assets/downvote.svg";
 import { useState } from "react";
 import Loader from "./Loader";
+import { minidenticonSvg } from "https://cdn.jsdelivr.net/npm/minidenticons@4.2.1/minidenticons.min.js";
 
-const Post = ({ post, handleUpvote, handleDownvote }) => {
+const Post = ({ index, post, handleUpvote, handleDownvote }) => {
   // Loader
   const [downvoting, setDownvoting] = useState(false);
   const [upvoting, setUpvoting] = useState(false);
@@ -11,8 +12,9 @@ const Post = ({ post, handleUpvote, handleDownvote }) => {
   return (
     <div className="post">
       <div className="postinfo">
-        <p className="post-creator">By - {`${post.creator}`}</p>
-        <p className="post-content">{post.content}</p>
+        <minidenticon-svg username={post.creator}></minidenticon-svg>
+        <p className="post-creator">{`${post.creator}`}</p>
+        <pre className="post-content">{post.content.replace(/\\n/g, "\n")}</pre>
         <div className="postimg">
           {post.imageUri && (
             <img
@@ -28,17 +30,14 @@ const Post = ({ post, handleUpvote, handleDownvote }) => {
               style={{ cursor: "pointer" }}
               onClick={async () => {
                 setUpvoting(true);
-                await handleUpvote(post.postId);
+                await handleUpvote(index);
                 setUpvoting(false);
               }}
             >
               {!upvoting ? (
-                <button
-                  disabled={post.usersVote === 1}
-                  className={post.usersVote === 1 ? "btnDao agreeLight" : "btnDao agreeBTN"}
-                >
+                <button className={post.userVote === 1 ? "btnDao agreeLight" : "btnDao agreeBTN"}>
                   <img className="icon" src={upvoteSvg} alt="check" />{" "}
-                  {/* {post.usersVote === 1 ? "Upvoted" : "Upvote"} */}
+                  {/* {post.userVote === 1 ? "Upvoted" : "Upvote"} */}
                   <span className="votes">{post.upvotes}</span>
                 </button>
               ) : (
@@ -52,17 +51,16 @@ const Post = ({ post, handleUpvote, handleDownvote }) => {
               style={{ cursor: "pointer" }}
               onClick={async () => {
                 setDownvoting(true);
-                await handleDownvote(post.postId);
+                await handleDownvote(index);
                 setDownvoting(false);
               }}
             >
               {!downvoting ? (
                 <button
-                  disabled={post.usersVote === 2}
-                  className={post.usersVote === 2 ? "btnDao disagreeLight" : "btnDao disagreeBTN"}
+                  className={post.userVote === 2 ? "btnDao disagreeLight" : "btnDao disagreeBTN"}
                 >
                   <img className="icon" src={downvoteSvg} alt="x" />{" "}
-                  {/* {post.usersVote === 2 ? "Downvoted" : "Downvote"} */}
+                  {/* {post.userVote === 2 ? "Downvoted" : "Downvote"} */}
                   <span className="votes">{post.downvotes}</span>
                 </button>
               ) : (

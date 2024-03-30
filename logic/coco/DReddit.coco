@@ -5,7 +5,8 @@ coco DReddit
 ////// Logic State 
 //////////////////////
 state persistent:
-    posts Map[U64]Post
+    posts []Post
+    userVotes Map[Address]Map[U64]U64 // 0 for not voted, 1 for upvoted, 2 for downvoted
 
 ////////////////////////
 ////// Classes
@@ -21,7 +22,7 @@ class Post:
     field upvotes U64
     field downvotes U64
     field comments []Comment
-    field votes Map[Address]U64 // 0 for not voted, 1 for upvoted, 2 for downvoted
+
 
 class Comment:
     field commentor String
@@ -58,7 +59,6 @@ endpoint invokable CreatePost!(creator, imageUri, content String) -> (post Post)
         upvotes: 0,
         downvotes: 0,
         comments: make([]Comment),
-        votes: make(Map[Address]U64)
     }
 
     // "<-" is used to read and then mutate the state
@@ -66,41 +66,41 @@ endpoint invokable CreatePost!(creator, imageUri, content String) -> (post Post)
     // block will be assigned to DReddit.State.posts)
     mutate posts <- DReddit.State.posts:
         newPost.id = len(posts)
-        posts[len(posts)] = newPost
+        posts = append(posts, newPost)
         yield post newPost // To return new Post
 
 // Upvote!() is an invokable to upvote
 // the post with given id
-endpoint invokable Upvote!(id U64):
+endpoint invokable Upvote!(postId U64):
     var user Address = Address(Sender)
     
-    mutate posts <- DReddit.State.posts:
-        var userVote = posts[id].votes[user]
+    mutate posts, userVotes <- DReddit.State.posts, DReddit.State.userVotes:
+        var userVote = userVotes[user][postId]
 
         if(userVote == 1):
             throw "Already Upvoted"
         else if(userVote == 2):
-            posts[id].downvotes -= 1
+            posts[postId].downvotes -= 1
         
-        posts[id].votes[user] = 1
-        posts[id].upvotes += 1
+        userVotes[user][postId] = 1
+        posts[postId].upvotes += 1
         
 
 // Downvote!() is an invokable to downvote
 // the post with given id
-endpoint invokable Downvote!(id U64):
+endpoint invokable Downvote!(postId U64):
     var user Address = Address(Sender)
     
-    mutate posts <- DReddit.State.posts:
-        var userVote = posts[id].votes[user]
+    mutate posts, userVotes <- DReddit.State.posts, DReddit.State.userVotes:
+        var userVote = userVotes[user][postId]
 
         if(userVote == 2):
             throw "Already Downvoted"
         else if(userVote == 1):
-            posts[id].upvotes -= 1
+            posts[postId].upvotes -= 1
         
-        posts[id].votes[user] = 2
-        posts[id].downvotes += 1
+        userVotes[user][postId] = 2
+        posts[postId].downvotes += 1
 
 endpoint invokable Comment!(id U64, commentor String, text String):
     var newComment = Comment{
@@ -116,5 +116,13 @@ endpoint invokable Comment!(id U64, commentor String, text String):
 ////// Read Endpoints
 ////////////////////
 
-endpoint invokable GetPosts() -> (posts Map[U64]Post):
+endpoint invokable GetPosts() -> (posts []Post):
     observe posts <- DReddit.State.posts
+
+endpoint invokable GetPost(postId U64) -> (post Post):
+    observe posts <- DReddit.State.posts:
+        yield post posts[postId]
+
+endpoint invokable GetUserVote(user Address, postId U64) -> (vote U64):
+    observe userVotes <- DReddit.State.userVotes:
+        yield vote userVotes[user][postId]

@@ -13,13 +13,9 @@ const Faucet = ({ user, showConnectModal }) => {
   const [refillTime, setRefillTime] = useState("00:00:00");
   const [isClaiming, setIsClaiming] = useState(false);
   const [balanceInfo, setBalanceInfo] = useState({
-    balance: 0,
+    balance: "0.0",
     isLocked: false,
   });
-
-  const convertBalance = (balance) => {
-    balance.includes("K") ? parseFloat(balance) * 1000 : parseFloat(balance);
-  };
 
   const handleClaim = async (moiId, address) => {
     try {
@@ -27,7 +23,7 @@ const Faucet = ({ user, showConnectModal }) => {
       const response = await axios.post(`${BASE_URL}/faucet/claim/token/${client_name}`, {
         moi_id: moiId,
         address,
-        amount: balanceInfo.balance,
+        amount: 20000,
       });
 
       setBalanceInfo({
@@ -47,7 +43,6 @@ const Faucet = ({ user, showConnectModal }) => {
       const { balance, is_locked: isLocked } = (
         await axios.get(import.meta.env.VITE_VOYAGE_API_URL + "/faucet/" + user.moiId + "/balance")
       ).data.data;
-      console.log(balance);
       setBalanceInfo({ balance, isLocked });
       setLoading(false);
     } catch (error) {
@@ -80,24 +75,21 @@ const Faucet = ({ user, showConnectModal }) => {
   }, [balanceInfo.isLocked]);
 
   return user.wallet ? (
-    <div className="faucet">
-      <Card classNames={"card"} type="primary">
+    <div className="">
+      <Card className="faucet" classNames={"card"} type="primary">
         <div className="">
           <Skeleton loading={isLoading} active paragraph={{ rows: 7 }} />
           {!isLoading && (
             <>
               <div className="">
-                <div className="">{balanceInfo.balance}</div>
-                <div className="">
-                  <div className="">Available Limit</div>
-                  <h1>
-                    <div className="text-overline">Refills in {refillTime}</div>
-                  </h1>
-                </div>
+                <div className="">Available Limit</div>
+                <h2 className="">{balanceInfo.balance} KMOI Tokens</h2>
+                <div className=""></div>
               </div>
               <div className="">
                 <button
-                  disabled={balanceInfo.isLocked}
+                  className="btn btn--primary"
+                  disabled={balanceInfo.isLocked || !parseInt(balanceInfo.balance)}
                   loading={isClaiming}
                   // participant_id = moi_id  in iome response object
                   onClick={() => handleClaim(user.moiId, user.wallet.address)}

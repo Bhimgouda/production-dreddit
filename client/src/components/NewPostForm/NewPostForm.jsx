@@ -35,7 +35,7 @@ const ModalOverlay = (props) => {
         imageUri = secure_url;
       }
 
-      await props.handleCreatePost(imageUri, postContent);
+      await props.handleCreatePost(imageUri, postContent.replace(/\n/g, "\\n"));
 
       setLoadingStatus({ isLoading: false, isSuccess: true });
       props.onClose();

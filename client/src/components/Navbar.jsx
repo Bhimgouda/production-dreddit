@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 // import { truncateStr } from "../utils/truncate";
 import logo from "../assets/socupt-logo.png";
+import { MetaMaskAvatar } from "react-metamask-avatar";
 
 const Navbar = ({ showConnectModal, user, updateUser }) => {
   const [toggleValue, setToggle] = useState(false);
@@ -48,12 +49,16 @@ const Navbar = ({ showConnectModal, user, updateUser }) => {
           Built on MOI
         </a> */}
         <Link to="/faucet">Faucet</Link>
+        <div>
+          <MetaMaskAvatar address={"0x8daffdb1dea6a1208a969afb5598527ccb7d47"} size={48} />
+          {console.log(user.wallet?.address.slice(0, 40))}
+        </div>
         <button
           className="btn btn--primary btn--connect"
           onClick={!user.wallet ? () => showConnectModal(true) : () => updateUser(null)}
           rel="noopener noreferrer"
         >
-          {!user.wallet ? "Login" : "Logout"}
+          {!user.wallet ? "Login" : `Logout: ${user.userName}`}
         </button>
       </ul>
     </nav>

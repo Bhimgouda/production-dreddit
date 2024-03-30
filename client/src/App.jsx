@@ -8,16 +8,38 @@ import { Route, Routes } from "react-router-dom";
 import Faucet from "./pages/Faucet";
 import ConnectModal from "./components/ConnectModal";
 
-const DEFAULT_USER = { name: undefined, wallet: undefined, moiId: undefined };
+const DEFAULT_USER = { userName: undefined, wallet: undefined, moiId: undefined };
+const provider = new VoyageProvider("babylon");
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [user, setUser] = useState(DEFAULT_USER);
 
+  useEffect(() => {
+    const initWallet = async () => {
+      const mnemonic = localStorage.getItem("mnemonic");
+      const userName = localStorage.getItem("userName");
+      const moiId = localStorage.getItem("moiId");
+
+      if (mnemonic && userName && moiId) {
+        const wallet = await Wallet.fromMnemonic(mnemonic, "m/44'/6174'/7020'/0/0");
+        wallet.connect(provider);
+        setUser({ wallet, userName, moiId });
+      }
+    };
+    initWallet();
+  }, []);
+
   const updateUser = (newUser) => {
-    if (!user) return setUser(DEFAULT_USER);
-    setUser(newUser);
+    if (newUser) return setUser(newUser);
+
+    localStorage.clear("mnemonic");
+    localStorage.clear("moiId");
+    localStorage.clear("userName");
+
+    setUser(DEFAULT_USER);
   };
+
   const showConnectModal = (value) => {
     setIsModalOpen(value);
   };

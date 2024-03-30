@@ -33,7 +33,12 @@ const ConnectModal = ({ isModalOpen, showConnectModal, updateUser }) => {
     try {
       const wallet = await Wallet.fromMnemonic(iomeObj.user.SRP(), "m/44'/6174'/7020'/0/0");
       wallet.connect(provider);
-      updateUser({ wallet, name: iomeObj.userName, moiId: iomeObj.user.ParticipantID });
+
+      localStorage.setItem("mnemonic", iomeObj.user.SRP());
+      localStorage.setItem("userName", iomeObj.userName);
+      localStorage.setItem("moiId", iomeObj.user.ParticipantID);
+
+      updateUser({ wallet, userName: iomeObj.userName, moiId: iomeObj.user.ParticipantID });
     } catch (e) {
       console.log(e);
       toastError(e.message);

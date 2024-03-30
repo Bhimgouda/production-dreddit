@@ -24,7 +24,7 @@
   --color-agree: #745abf;
   --color-agree--dark: #6b40c9;
 
-  --color-disagree--light: #d03d2c;
+  --color-disagree--light: #cf5042;
   --color-disagree: #d03d2c;
   --color-disagree--dark: #c92f1e;
 
@@ -251,6 +251,7 @@ header .dropdown-toggle::after {
 }
 
 .btn {
+
   padding: 15px 30px;
   line-height: 1;
   border: none;
@@ -259,6 +260,7 @@ header .dropdown-toggle::after {
   border-radius: 8px;
   font-family: var(--font-satoshi-regular);
   transition: background-color 0.3s ease;
+  margin: 0;
 }
 
 .btn--primary {
@@ -437,6 +439,21 @@ header .dropdown-toggle::after {
   padding: 20px 60px;
   color: #e5e7eb;
 }
+
+.postinfo{
+  position: relative;
+}
+
+minidenticon-svg svg {
+  border-radius: 50%;
+  background-color: grey;
+  height: 48px;
+  width: 48px;
+  position: absolute;
+  top: 0px;
+  left: -50px;
+};
+
 .postinfo,
 .postimg {
   width: 100%;
@@ -894,5 +911,18 @@ button:hover {
   border-left: 0.1px solid var(--color-border);
   border-right: 0.1px solid var(--color-border);
 }
+
+/* FAUCET */
+
+.faucet{
+  background-color: #000;
+  color: #fff;
+}
+
+.faucet .btn--primary{
+  margin: 20px 0;
+}
+
+
 
 

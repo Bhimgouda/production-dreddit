@@ -1,4 +1,5 @@
 import { VoyageProvider, Wallet, getLogicDriver } from "js-moi-sdk";
+import { toastInfo } from "../utils/toastWrapper";
 
 const provider = new VoyageProvider("babylon");
 const logicId = import.meta.env.VITE_LOGIC_ID;
@@ -10,18 +11,21 @@ const logicId = import.meta.env.VITE_LOGIC_ID;
 const CreatePost = async (wallet, creator, imageUri, content) => {
   const logicDriver = await getLogicDriver(logicId, wallet);
   const ixResponse = await logicDriver.routines.CreatePost(creator, imageUri, content);
+  toastInfo("Creating post");
   return ixResponse.result();
 };
 
-const Upvote = async (wallet, id) => {
+const Upvote = async (wallet, postId) => {
   const logicDriver = await getLogicDriver(logicId, wallet);
-  const ixResponse = await logicDriver.routines.Upvote(id);
+  const ixResponse = await logicDriver.routines.Upvote(postId);
+  toastInfo("Upvoting");
   return ixResponse.result();
 };
 
-const Downvote = async (wallet, id) => {
+const Downvote = async (wallet, postId) => {
   const logicDriver = await getLogicDriver(logicId, wallet);
-  const ixResponse = await logicDriver.routines.Downvote(id);
+  const ixResponse = await logicDriver.routines.Downvote(postId);
+  toastInfo("Downvoting");
   return ixResponse.result();
 };
 
@@ -34,13 +38,19 @@ const GetPosts = async () => {
   return logicDriver.routines.GetPosts();
 };
 
-const GetUserVote = async (id, userAddress) => {
+const GetPost = async (postId) => {
   const logicDriver = await getLogicDriver(logicId, provider);
-  return logicDriver.routines.GetUserVote(id, userAddress);
+  return logicDriver.routines.GetPost(postId);
+};
+
+const GetUserVote = async (userAddress, postId) => {
+  const logicDriver = await getLogicDriver(logicId, provider);
+  return logicDriver.routines.GetUserVote(userAddress, postId);
 };
 
 const logic = {
   GetPosts,
+  GetPost,
   GetUserVote,
   CreatePost,
   Upvote,

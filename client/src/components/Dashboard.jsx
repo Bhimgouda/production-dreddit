@@ -20,7 +20,7 @@ const Dashboard = ({
   async function loadMorePosts() {
     setLoadingMore(true);
     setTimeout(() => {
-      setVisiblePosts(visiblePosts + 2);
+      setVisiblePosts(visiblePosts + 10);
       setLoadingMore(false);
     }, 300);
   }
@@ -44,7 +44,8 @@ const Dashboard = ({
             </div>
             {posts?.slice(0, visiblePosts).map((post, index) => (
               <Post
-                id={index}
+                user={user}
+                index={index}
                 key={index}
                 handleUpvote={handleUpvote}
                 handleDownvote={handleDownvote}
