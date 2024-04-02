@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import Post from "./Post";
 import Loader from "./Loader";
-import { INITIAL_POSTS } from "./utils/constants";
+
+const postsRange = 10;
 
 const Dashboard = ({
   setIsNewPostFormOpen,
@@ -12,7 +13,7 @@ const Dashboard = ({
   handleUpvote,
   handleDownvote,
 }) => {
-  const [visiblePosts, setVisiblePosts] = useState(INITIAL_POSTS);
+  const [visiblePosts, setVisiblePosts] = useState(postsRange);
   const [loadingMore, setLoadingMore] = useState(false);
   const popupHandler = () => {
     setIsNewPostFormOpen(true);
@@ -20,7 +21,7 @@ const Dashboard = ({
   async function loadMorePosts() {
     setLoadingMore(true);
     setTimeout(() => {
-      setVisiblePosts(visiblePosts + 10);
+      setVisiblePosts(visiblePosts + postsRange);
       setLoadingMore(false);
     }, 300);
   }

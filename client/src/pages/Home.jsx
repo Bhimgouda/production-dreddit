@@ -31,12 +31,7 @@ const Home = ({ user, showConnectModal }) => {
       setLoadingPost(false);
     } catch (e) {
       setLoadingPost(false);
-      console.log(e);
-      toastError(
-        e.message.startsWith("account not found")
-          ? "Account Not Found, Please claim faucet from Voyage"
-          : e.message
-      );
+      toastError(e.message);
     }
   };
 
