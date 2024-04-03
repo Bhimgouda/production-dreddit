@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 // import { truncateStr } from "../utils/truncate";
 import logo from "../assets/socupt-logo.png";
 import { MetaMaskAvatar } from "react-metamask-avatar";
+import { formatNumber } from "../utils/formatNumber";
 
 const Navbar = ({ showConnectModal, user, updateUser }) => {
   const [toggleValue, setToggle] = useState(false);
@@ -37,9 +38,9 @@ const Navbar = ({ showConnectModal, user, updateUser }) => {
           <div></div>
           <div></div>
         </div>
-        <a href="/" className="">
+        <Link to="/">
           <img style={{ height: 50 }} src={logo} />
-        </a>
+        </Link>
       </div>
       <ul
         ref={navRef}
@@ -53,6 +54,9 @@ const Navbar = ({ showConnectModal, user, updateUser }) => {
           <MetaMaskAvatar address={"0x8daffdb1dea6a1208a969afb5598527ccb7d47"} size={48} />
           {console.log(user.wallet?.address.slice(0, 40))}
         </div>
+        {user.wallet && (
+          <div className="balance">{formatNumber(user.wallet.balance || 0)} KMOI</div>
+        )}
         <button
           className="btn btn--primary btn--connect"
           onClick={!user.wallet ? () => showConnectModal(true) : () => updateUser(null)}

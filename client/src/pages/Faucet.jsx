@@ -4,16 +4,18 @@ import Loader from "../components/Loader";
 import axios from "axios";
 import { calculateRemainingTime } from "../utils/calculateRemainingTime";
 import { toastError } from "../utils/toastWrapper";
+import { formatNumber } from "../utils/formatNumber";
 
 const BASE_URL = import.meta.env.VITE_VOYAGE_API_URL;
 const client_name = import.meta.env.VITE_CLIENT_NAME;
+const CLAIM_AMOUNT = 2000;
 
 const Faucet = ({ user, showConnectModal }) => {
   const [isLoading, setLoading] = useState(false);
   const [refillTime, setRefillTime] = useState("00:00:00");
   const [isClaiming, setIsClaiming] = useState(false);
   const [balanceInfo, setBalanceInfo] = useState({
-    balance: "0.0",
+    balance: formatNumber(0),
     isLocked: false,
   });
 
@@ -23,12 +25,12 @@ const Faucet = ({ user, showConnectModal }) => {
       const response = await axios.post(`${BASE_URL}/faucet/claim/token/${client_name}`, {
         moi_id: moiId,
         address,
-        amount: 20000,
+        amount: CLAIM_AMOUNT,
       });
 
       setBalanceInfo({
-        balance: response.data.balance,
-        isLocked: response.data.is_locked,
+        balance: formatNumber(0),
+        isLocked: true,
       });
       setIsClaiming(false);
     } catch (error) {
@@ -47,7 +49,7 @@ const Faucet = ({ user, showConnectModal }) => {
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      setBalanceInfo({ isLocked: false, balance: "20k" });
+      setBalanceInfo({ isLocked: false, balance: formatNumber(CLAIM_AMOUNT) });
     }
   };
 

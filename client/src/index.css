@@ -20,11 +20,11 @@
   --color-primary: rgba(71, 42, 145);
   --color-primary--dark: rgba(71, 42, 145, 0.8);
 
-  --color-agree--light: #8c7cbd;
+  --color-agree--light: #978abb;
   --color-agree: #745abf;
   --color-agree--dark: #6b40c9;
 
-  --color-disagree--light: #cf5042;
+  --color-disagree--light: #c9695f;
   --color-disagree: #d03d2c;
   --color-disagree--dark: #c92f1e;
 
@@ -251,7 +251,6 @@ header .dropdown-toggle::after {
 }
 
 .btn {
-
   padding: 15px 30px;
   line-height: 1;
   border: none;
@@ -275,6 +274,19 @@ header .dropdown-toggle::after {
 .navbar .btn--connect {
   height: 50px;
   min-width: 120px;
+  border-radius: 5px;
+}
+
+.navbar .balance {
+  height: 50px;
+  min-width: max-content;
+  background-color: #00284f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top-left-radius:5px;
+  border-bottom-left-radius:5px;
+  padding: 0 10px ;
 }
 
 .blankLeft {
@@ -454,6 +466,19 @@ minidenticon-svg svg {
   left: -50px;
 };
 
+
+/* @media (max-width: 640px) {
+  minidenticon-svg svg {
+    border-radius: 50%;
+    background-color: grey;
+    height: 48px;
+    width: 48px;
+    position: absolute;
+    top: 0px;
+    left: 1000px;
+  };
+} */
+
 .postinfo,
 .postimg {
   width: 100%;
@@ -505,8 +530,12 @@ minidenticon-svg svg {
   background: var(--color-agree);
   color: #fff;
 }
-
-.agreeLight {
+.agreeBTN:disabled {
+  cursor:default  !important;
+  background:var(--color-agree--light);
+}
+.agreeBTN:disabled:hover {
+  cursor:default  !important;
   background:var(--color-agree--light);
 }
 
@@ -523,8 +552,13 @@ minidenticon-svg svg {
   color: #fff;
 }
 
-.disagreeLight {
-  background: var(--color-disagree--light);
+.disagreeBTN:disabled {
+  cursor:default  !important;
+  background:var(--color-disagree--light);
+}
+.disagreeBTN:disabled:hover {
+  cursor:default  !important;
+  background:var(--color-disagree--light);
 }
 
 .disagreeBTN:hover {

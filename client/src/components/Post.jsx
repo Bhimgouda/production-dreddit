@@ -35,13 +35,13 @@ const Post = ({ index, post, handleUpvote, handleDownvote }) => {
               }}
             >
               {!upvoting ? (
-                <button className={post.userVote === 1 ? "btnDao agreeLight" : "btnDao agreeBTN"}>
+                <button disabled={post.userVote === 1} className={"btnDao agreeBTN"}>
                   <img className="icon" src={upvoteSvg} alt="check" />{" "}
                   {/* {post.userVote === 1 ? "Upvoted" : "Upvote"} */}
                   <span className="votes">{post.upvotes}</span>
                 </button>
               ) : (
-                <button className="btnDao agreeBTN">
+                <button disabled={upvoting} className="btnDao agreeBTN">
                   <Loader loading={upvoting} color="#fff" />
                 </button>
               )}
@@ -56,15 +56,13 @@ const Post = ({ index, post, handleUpvote, handleDownvote }) => {
               }}
             >
               {!downvoting ? (
-                <button
-                  className={post.userVote === 2 ? "btnDao disagreeLight" : "btnDao disagreeBTN"}
-                >
+                <button disabled={post.userVote === 2} className={"btnDao disagreeBTN"}>
                   <img className="icon" src={downvoteSvg} alt="x" />{" "}
                   {/* {post.userVote === 2 ? "Downvoted" : "Downvote"} */}
                   <span className="votes">{post.downvotes}</span>
                 </button>
               ) : (
-                <button className="btnDao disagreeBTN">
+                <button disabled={upvoting} className="btnDao disagreeBTN">
                   <Loader loading={downvoting} color="#fff" />
                 </button>
               )}

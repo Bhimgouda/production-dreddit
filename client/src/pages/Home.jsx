@@ -5,6 +5,7 @@ import Dashboard from "../components/Dashboard";
 import logic from "../interface/logic";
 import { toastError, toastInfo, toastSuccess } from "../utils/toastWrapper";
 import { useNavigate } from "react-router-dom";
+import { getUserBalance } from "../utils/getUserBalance";
 
 const Home = ({ user, showConnectModal }) => {
   const [posts, setPosts] = useState([]);
@@ -55,10 +56,13 @@ const Home = ({ user, showConnectModal }) => {
       );
 
       setPosts([newPost, ...posts]);
+      const balance = await getUserBalance(user.wallet.getProvider, wallet.address);
+      setUser({ ...user, balance });
+      toastSuccess("Succesfully Created a Post");
     } catch (e) {
       console.log(e);
       if (e.message.includes("account not found")) {
-        toastError("Please claim KMOI tokens to start");
+        toastError("Please claim KMOI tokens to interact");
         return navigate("/faucet");
       }
       toastError(e.message);
@@ -86,11 +90,13 @@ const Home = ({ user, showConnectModal }) => {
         return updatedPosts;
       });
 
+      const balance = await getUserBalance(user.wallet.getProvider, wallet.address);
+      setUser({ ...user, balance });
       toastSuccess("Succesfully Upvoted");
     } catch (e) {
       console.log(e);
       if (e.message.includes("account not found")) {
-        toastError("Please claim KMOI tokens to start");
+        toastError("Please claim KMOI tokens to interact");
         return navigate("/faucet");
       }
       toastError(e.message);
@@ -118,11 +124,13 @@ const Home = ({ user, showConnectModal }) => {
         return updatedPosts;
       });
 
+      const balance = await getUserBalance(user.wallet.getProvider, wallet.address);
+      setUser({ ...user, balance });
       toastSuccess("Succesfully Downvoted");
     } catch (e) {
       console.log(e);
       if (e.message.includes("account not found")) {
-        toastError("Please claim KMOI tokens to start");
+        toastError("Please claim KMOI tokens to interact");
         return navigate("/faucet");
       }
       toastError(e.message);

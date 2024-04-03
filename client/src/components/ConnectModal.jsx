@@ -3,12 +3,16 @@ import { Input, Modal } from "antd";
 import { Connect, IOMe } from "@iome/react-widget";
 import Loader from "./Loader";
 import { VoyageProvider, Wallet } from "js-moi-sdk";
-import { toastError } from "../utils/toastWrapper";
+import { toastError, toastInfo } from "../utils/toastWrapper";
+import { useNavigate } from "react-router-dom";
+import { getUserBalance } from "../utils/getUserBalance";
 
 const provider = new VoyageProvider("babylon");
 
 const ConnectModal = ({ isModalOpen, showConnectModal, updateUser }) => {
   const [iome, setIome] = useState();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const initializeIome = async () => {
@@ -22,7 +26,7 @@ const ConnectModal = ({ isModalOpen, showConnectModal, updateUser }) => {
         setIome(newIome);
       } catch (e) {
         console.log(e);
-        toastError(e.message);
+        toastInfo(e.message);
       }
     };
     initializeIome();
@@ -37,6 +41,13 @@ const ConnectModal = ({ isModalOpen, showConnectModal, updateUser }) => {
       localStorage.setItem("mnemonic", iomeObj.user.SRP());
       localStorage.setItem("userName", iomeObj.userName);
       localStorage.setItem("moiId", iomeObj.user.ParticipantID);
+
+      const balance = await getUserBalance(provider, wallet.address);
+      if (balance) {
+        wallet.balance = balance;
+      } else {
+        navigate("/faucet");
+      }
 
       updateUser({ wallet, userName: iomeObj.userName, moiId: iomeObj.user.ParticipantID });
     } catch (e) {
