@@ -280,7 +280,7 @@ header .dropdown-toggle::after {
 .navbar .balance {
   height: 50px;
   min-width: max-content;
-  background-color: #00284f;
+  background-color: var(--color-agree);
   display: flex;
   justify-content: center;
   align-items: center;
