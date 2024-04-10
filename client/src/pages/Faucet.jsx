@@ -8,7 +8,7 @@ import { formatNumber } from "../utils/formatNumber";
 
 const BASE_URL = import.meta.env.VITE_VOYAGE_API_URL;
 const client_name = import.meta.env.VITE_CLIENT_NAME;
-const CLAIM_AMOUNT = 2000;
+const CLAIM_AMOUNT = 20000;
 
 const Faucet = ({ user, showConnectModal }) => {
   const [isLoading, setLoading] = useState(false);
