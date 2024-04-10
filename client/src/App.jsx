@@ -16,6 +16,7 @@ const provider = new VoyageProvider("babylon");
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [user, setUser] = useState(DEFAULT_USER);
+  const [walletBalance, setWalletBalance] = useState("");
 
   const navigate = useNavigate();
 
@@ -28,8 +29,6 @@ function App() {
       if (mnemonic && userName && moiId) {
         const wallet = await Wallet.fromMnemonic(mnemonic, "m/44'/6174'/7020'/0/0");
         wallet.connect(provider);
-        wallet.balance = await getUserBalance(provider, wallet.address);
-
         setUser({ wallet, userName, moiId });
       } else {
         showConnectModal(true);
@@ -37,6 +36,13 @@ function App() {
     };
     initWallet();
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const balance = updateWalletBalance();
+    if (balance < 1000) navigate("/faucet");
+  }, [user]);
 
   const updateUser = (newUser) => {
     if (newUser) return setUser(newUser);
@@ -48,13 +54,24 @@ function App() {
     setUser(DEFAULT_USER);
   };
 
+  const updateWalletBalance = async () => {
+    const balance = await getUserBalance(provider, user.wallet.address);
+    setWalletBalance(balance);
+    return balance;
+  };
+
   const showConnectModal = (value) => {
     setIsModalOpen(value);
   };
 
   return (
     <>
-      <Navbar showConnectModal={showConnectModal} user={user} updateUser={updateUser} />
+      <Navbar
+        showConnectModal={showConnectModal}
+        user={user}
+        walletBalance={walletBalance}
+        updateUser={updateUser}
+      />
       <Toaster />
       <ConnectModal
         get
@@ -64,7 +81,16 @@ function App() {
       />
 
       <Routes>
-        <Route path="/" element={<Home user={user} showConnectModal={showConnectModal} />} />
+        <Route
+          path="/"
+          element={
+            <Home
+              updateWalletBalance={updateWalletBalance}
+              user={user}
+              showConnectModal={showConnectModal}
+            />
+          }
+        />
         <Route
           path="/faucet"
           element={<Faucet user={user} showConnectModal={showConnectModal} />}

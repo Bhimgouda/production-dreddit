@@ -7,7 +7,7 @@ import { toastError, toastInfo, toastSuccess } from "../utils/toastWrapper";
 import { useNavigate } from "react-router-dom";
 import { getUserBalance } from "../utils/getUserBalance";
 
-const Home = ({ user, showConnectModal }) => {
+const Home = ({ user, showConnectModal, updateWalletBalance }) => {
   const [posts, setPosts] = useState([]);
   const [isNewPostFormOpen, setIsNewPostFormOpen] = useState(false);
   const [loadingPost, setLoadingPost] = useState(false);
@@ -56,8 +56,8 @@ const Home = ({ user, showConnectModal }) => {
       );
 
       setPosts([newPost, ...posts]);
-      const balance = await getUserBalance(user.wallet.getProvider, wallet.address);
-      setUser({ ...user, balance });
+
+      updateWalletBalance();
       toastSuccess("Succesfully Created a Post");
     } catch (e) {
       console.log(e);
@@ -90,8 +90,7 @@ const Home = ({ user, showConnectModal }) => {
         return updatedPosts;
       });
 
-      const balance = await getUserBalance(user.wallet.getProvider, wallet.address);
-      setUser({ ...user, balance });
+      updateWalletBalance();
       toastSuccess("Succesfully Upvoted");
     } catch (e) {
       console.log(e);
@@ -124,8 +123,7 @@ const Home = ({ user, showConnectModal }) => {
         return updatedPosts;
       });
 
-      const balance = await getUserBalance(user.wallet.getProvider, wallet.address);
-      setUser({ ...user, balance });
+      updateWalletBalance();
       toastSuccess("Succesfully Downvoted");
     } catch (e) {
       console.log(e);

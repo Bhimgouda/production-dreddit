@@ -5,7 +5,7 @@ import logo from "../assets/socupt-logo.png";
 import { MetaMaskAvatar } from "react-metamask-avatar";
 import { formatNumber } from "../utils/formatNumber";
 
-const Navbar = ({ showConnectModal, user, updateUser }) => {
+const Navbar = ({ showConnectModal, user, updateUser, walletBalance }) => {
   const [toggleValue, setToggle] = useState(false);
 
   const navRef = useRef(null);
@@ -54,9 +54,7 @@ const Navbar = ({ showConnectModal, user, updateUser }) => {
           <MetaMaskAvatar address={"0x8daffdb1dea6a1208a969afb5598527ccb7d47"} size={48} />
           {console.log(user.wallet?.address.slice(0, 40))}
         </div>
-        {user.wallet && (
-          <div className="balance">{formatNumber(user.wallet.balance || 0)} KMOI</div>
-        )}
+        {user.wallet && <div className="balance">{formatNumber(walletBalance || 0)} KMOI</div>}
         <button
           className="btn btn--primary btn--connect"
           onClick={!user.wallet ? () => showConnectModal(true) : () => updateUser(null)}

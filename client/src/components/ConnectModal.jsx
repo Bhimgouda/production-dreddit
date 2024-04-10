@@ -42,13 +42,6 @@ const ConnectModal = ({ isModalOpen, showConnectModal, updateUser }) => {
       localStorage.setItem("userName", iomeObj.userName);
       localStorage.setItem("moiId", iomeObj.user.ParticipantID);
 
-      const balance = await getUserBalance(provider, wallet.address);
-      if (balance) {
-        wallet.balance = balance;
-      } else {
-        navigate("/faucet");
-      }
-
       updateUser({ wallet, userName: iomeObj.userName, moiId: iomeObj.user.ParticipantID });
     } catch (e) {
       console.log(e);

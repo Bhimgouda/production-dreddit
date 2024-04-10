@@ -275,12 +275,13 @@ header .dropdown-toggle::after {
   height: 50px;
   min-width: 120px;
   border-radius: 5px;
+  background-color: var(--color-agree--dark);
 }
 
 .navbar .balance {
   height: 50px;
   min-width: max-content;
-  background-color: var(--color-agree);
+  background-color:#00284f;
   display: flex;
   justify-content: center;
   align-items: center;
