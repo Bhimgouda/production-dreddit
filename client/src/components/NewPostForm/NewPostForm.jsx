@@ -20,9 +20,9 @@ const ModalOverlay = (props) => {
   const handleCreatePost = async (e) => {
     e.preventDefault();
     try {
+      if (postContent < 10) return toastError("Post Content needs to be more than 10 characters");
       setLoadingStatus({ isLoading: true, isSuccess: false });
 
-      if (postContent < 10) return toastError("Post Content needs to be more than 10 characters");
       let imageUri = "";
       if (imageFile) {
         const formData = new FormData();
