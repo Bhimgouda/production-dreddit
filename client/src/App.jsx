@@ -93,7 +93,13 @@ function App() {
         />
         <Route
           path="/faucet"
-          element={<Faucet user={user} showConnectModal={showConnectModal} />}
+          element={
+            <Faucet
+              updateWalletBalance={updateWalletBalance}
+              user={user}
+              showConnectModal={showConnectModal}
+            />
+          }
         />
       </Routes>
     </>

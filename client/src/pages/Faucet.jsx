@@ -10,7 +10,7 @@ const BASE_URL = import.meta.env.VITE_VOYAGE_API_URL;
 const client_name = import.meta.env.VITE_CLIENT_NAME;
 const CLAIM_AMOUNT = 20000;
 
-const Faucet = ({ user, showConnectModal }) => {
+const Faucet = ({ user, updateWalletBalance }) => {
   const [isLoading, setLoading] = useState(false);
   const [refillTime, setRefillTime] = useState("00:00:00");
   const [isClaiming, setIsClaiming] = useState(false);
@@ -46,6 +46,7 @@ const Faucet = ({ user, showConnectModal }) => {
         await axios.get(import.meta.env.VITE_VOYAGE_API_URL + "/faucet/" + user.moiId + "/balance")
       ).data.data;
       setBalanceInfo({ balance, isLocked });
+      updateWalletBalance();
       setLoading(false);
     } catch (error) {
       setLoading(false);

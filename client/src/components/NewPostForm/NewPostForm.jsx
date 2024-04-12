@@ -22,7 +22,7 @@ const ModalOverlay = (props) => {
     try {
       setLoadingStatus({ isLoading: true, isSuccess: false });
 
-      if (postContent < 10) return error("Post Content needs to be more than 10 characters");
+      if (postContent < 10) return toastError("Post Content needs to be more than 10 characters");
       let imageUri = "";
       if (imageFile) {
         const formData = new FormData();
@@ -85,6 +85,7 @@ const ModalOverlay = (props) => {
               <button className={classes.btn}>Post</button>
             ) : (
               <button
+                disabled={loadingStatus.isLoading}
                 style={{ display: "flex", justifyContent: "center", alignItems: "center" }}
                 className={classes.btn}
               >

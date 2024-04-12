@@ -60,7 +60,6 @@ const Home = ({ user, showConnectModal, updateWalletBalance }) => {
       updateWalletBalance();
       toastSuccess("Succesfully Created a Post");
     } catch (e) {
-      console.log(e);
       if (e.message.includes("account not found")) {
         toastError("Please claim KMOI tokens to interact");
         return navigate("/faucet");
