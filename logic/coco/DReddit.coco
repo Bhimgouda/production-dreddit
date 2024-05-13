@@ -21,20 +21,14 @@ class Post:
     field content String
     field upvotes U64
     field downvotes U64
-    field comments []Comment
-
-
-class Comment:
-    field commentor String
-    field text String
 
 ////////////////////////
 ////// Deployer Endpoints
 //////////////////////
 
-// Init!() deployer is a constructor that leaves
+// Init() deployer is a constructor that leaves
 // the persistent state untouched at the deploy time.
-endpoint deployer Init!():
+endpoint deployer Init():
     pass
 
 // pass means do nothing
@@ -43,22 +37,21 @@ endpoint deployer Init!():
 ////// Write Endpoints
 //////////////////////
 
-// "!" after endpoint name means endpoint mutates
+// "" after endpoint name means endpoint mutates
 // the logic state 
 
-// CreatePost!() is an invokable that creates & adds a new post
+// CreatePost() is an invokable that creates & adds a new post
 // and also returns the new post
-endpoint invokable CreatePost!(creator, imageUri, content String) -> (post Post):
+endpoint invokable persistent CreatePost(creator, imageUri, content String) -> (post Post):
     if(creator == "" || content == ""):
         throw "Invalid Input"
 
-    var newPost = Post{
+    memory newPost = Post{
         creator: creator,
         imageUri: imageUri,
         content: content,
         upvotes: 0,
         downvotes: 0,
-        comments: make([]Comment),
     }
 
     // "<-" is used to read and then mutate the state
@@ -66,50 +59,48 @@ endpoint invokable CreatePost!(creator, imageUri, content String) -> (post Post)
     // block will be assigned to DReddit.State.posts)
     mutate posts <- DReddit.State.posts:
         newPost.id = len(posts)
-        posts = append(posts, newPost)
+        disperse append(posts, newPost)
         yield post newPost // To return new Post
 
-// Upvote!() is an invokable to upvote
+// Upvote() is an invokable persistent to upvote
 // the post with given id
-endpoint invokable Upvote!(postId U64):
-    var user Address = Address(Sender)
+endpoint invokable persistent Upvote(postId U64):
+    memory user Address = Address(Sender)
     
     mutate posts, userVotes <- DReddit.State.posts, DReddit.State.userVotes:
-        var userVote = userVotes[user][postId]
+        memory userVote = userVotes[user][postId]
 
         if(userVote == 1):
-            throw "Already Upvoted"
+                throw "Already Upvoted"
+
         else if(userVote == 2):
-            posts[postId].downvotes -= 1
+                posts[postId].downvotes -= 1
         
+        if(userVote == 0):
+            disperse make(Map[U64]U64) -> userVotes[user]
+
         userVotes[user][postId] = 1
         posts[postId].upvotes += 1
         
 
-// Downvote!() is an invokable to downvote
+// Downvote() is an invokable persistent to downvote
 // the post with given id
-endpoint invokable Downvote!(postId U64):
-    var user Address = Address(Sender)
+endpoint invokable persistent Downvote(postId U64):
+    memory user Address = Address(Sender)
     
     mutate posts, userVotes <- DReddit.State.posts, DReddit.State.userVotes:
-        var userVote = userVotes[user][postId]
+        memory userVote = userVotes[user][postId]
 
         if(userVote == 2):
-            throw "Already Downvoted"
+                throw "Already Downvoted"
         else if(userVote == 1):
-            posts[postId].upvotes -= 1
+                posts[postId].upvotes -= 1
         
+        if(userVote == 0):
+            disperse make(Map[U64]U64) -> userVotes[user]
+
         userVotes[user][postId] = 2
         posts[postId].downvotes += 1
-
-endpoint invokable Comment!(id U64, commentor String, text String):
-    var newComment = Comment{
-        commentor: commentor,
-        text: text
-    }
-
-    mutate posts <- DReddit.State.posts:
-        posts[id].comments = append(posts[id].comments, newComment)
 
 
 //////////////////////
@@ -117,7 +108,20 @@ endpoint invokable Comment!(id U64, commentor String, text String):
 ////////////////////
 
 endpoint invokable GetPosts() -> (posts []Post):
-    observe posts <- DReddit.State.posts
+    memory memPosts []Post
+    observe sPosts <- DReddit.State.posts:
+        for index, post in sPosts:
+            memory memPost Post
+            memPost = Post {
+                id: post.id,
+                creator: post.creator,
+                imageUri: post.imageUri,
+                content: post.content,
+                upvotes: post.upvotes,
+                downvotes: post.downvotes
+            }
+            append(memPosts, memPost)
+    posts = memPosts
 
 endpoint invokable GetPost(postId U64) -> (post Post):
     observe posts <- DReddit.State.posts:

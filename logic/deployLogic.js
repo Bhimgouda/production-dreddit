@@ -10,12 +10,9 @@ const provider = new VoyageProvider("babylon");
 
 // Function to instantiate a wallet with provider and sender account
 const constructWallet = async () => {
-  const wallet = new Wallet(provider);
-
-  // The path derives your account from the mnemonic
   const accountPath = "m/44'/6174'/7020'/0/0";
-
-  await wallet.fromMnemonic(MNEMONIC, accountPath);
+  const wallet = await Wallet.fromMnemonic(MNEMONIC, accountPath);
+  wallet.connect(provider);
   return wallet;
 };
 
@@ -27,7 +24,7 @@ const deployDRedditLogic = async () => {
   const DRedditLogic = new LogicFactory(DRedditManifest, wallet);
 
   // Submitting the Interaction to the network to deploy the logic
-  const ixResponse = await DRedditLogic.deploy("Init!", { fuelLimit: 5000 });
+  const ixResponse = await DRedditLogic.deploy("Init", { fuelLimit: 5000 });
 
   console.log("------ Deploying Logic ----------");
   console.log(ixResponse);
